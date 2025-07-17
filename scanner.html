@@ -1,0 +1,1040 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Document Scanner | Professional Scanning Tool</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  
+  <!-- Tailwind Configuration -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#2563eb', // Main color: professional blue
+            secondary: '#4f46e5', // Secondary color: indigo
+            neutral: {
+              100: '#f5f7fa',
+              200: '#e4e7eb',
+              700: '#374151',
+              800: '#1f2937',
+              900: '#111827'
+            }
+          },
+          fontFamily: {
+            inter: ['Inter', 'system-ui', 'sans-serif'],
+          },
+          boxShadow: {
+            'card': '0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.03)',
+            'hover': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+          }
+        },
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .transition-height {
+        transition-property: height;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        transition-duration: 300ms;
+      }
+      .backdrop-blur {
+        backdrop-filter: blur(8px);
+      }
+      .text-gradient {
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .cursor-move {
+        cursor: move;
+      }
+      .cursor-pointer {
+        cursor: pointer;
+      }
+      .prompt-container {
+        max-height: 200px;
+        overflow-y: auto;
+      }
+    }
+  </style>
+</head>
+
+<body class="font-inter bg-neutral-100 text-neutral-800 min-h-screen">
+  <!-- Top Navigation -->
+  <header class="bg-white shadow-sm sticky top-0 z-50 transition-all duration-300">
+    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+      <div class="flex items-center space-x-2">
+        <i class="fa fa-file-text-o text-primary text-2xl"></i>
+        <h1 class="text-xl font-bold bg-gradient-to-r from-primary to-secondary text-gradient">Smart Document Scanner</h1>
+      </div>
+      <div class="hidden md:flex items-center space-x-6">
+        <a href="https://aipix.net/en/virtual-scanner" class="text-neutral-700 hover:text-primary transition-colors">User Guide</a>
+        <a href="https://aipix.net/en/contact-us" class="text-neutral-700 hover:text-primary transition-colors">Contact Us</a>
+        <button class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg transition-all shadow-md hover:shadow-lg">
+          <i class="fa fa-sign-in mr-1"></i> Login
+        </button>
+      </div>
+      <button class="md:hidden text-neutral-700">
+        <i class="fa fa-bars text-xl"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="container mx-auto px-4 py-8 md:py-12">
+    <!-- Introduction Section -->
+    <section class="text-center mb-12 max-w-3xl mx-auto">
+      <h2 class="text-[clamp(1.75rem,4vw,2.5rem)] font-bold text-neutral-900 mb-4">
+        Easily Scan Documents with Smart Boundary Detection
+      </h2>
+      <p class="text-neutral-700 text-lg mb-8">
+        Upload images, automatically detect document boundaries, generate clear scans, and manually adjust for efficient document processing
+      </p>
+    </section>
+
+    
+
+    <!-- Upload Area -->
+    <section class="max-w-4xl mx-auto mb-12">
+      <div id="uploadContainer" class="border-2 border-dashed border-neutral-300 rounded-xl p-8 text-center hover:border-primary transition-colors duration-300 bg-white/50 backdrop-blur cursor-pointer group">
+        <input type="file" id="upload" accept="image/*" class="hidden" />
+        <label for="upload" class="cursor-pointer">
+          <div class="flex flex-col items-center">
+            <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+              <i class="fa fa-cloud-upload text-primary text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-semibold mb-2">Upload Document Image</h3>
+            <p class="text-neutral-600 mb-4">Supports JPG, PNG formats, max 10MB</p>
+            <button class="bg-primary hover:bg-primary/90 text-white px-6 py-2.5 rounded-lg transition-all shadow-md hover:shadow-lg">
+              Select Image
+            </button>
+          </div>
+        </label>
+      </div>
+    </section>
+
+    <!-- Processing Area -->
+    <section class="max-w-6xl mx-auto grid md:grid-cols-2 gap-8 mb-12">
+      <!-- Preview Area -->
+      <div class="bg-white rounded-xl shadow-card p-5 hover:shadow-hover transition-all duration-300">
+        <h3 class="text-lg font-semibold mb-4 flex items-center">
+          <i class="fa fa-eye text-primary mr-2"></i> Image Preview
+        </h3>
+        <div id="canvasContainer" class="relative w-full bg-neutral-100 rounded-lg overflow-hidden min-h-[200px] flex items-center justify-center">
+          <img id="imagePreview" class="hidden max-h-[500px] object-contain" />
+          <svg id="svgOverlay" class="absolute top-0 left-0"></svg>
+          <div id="previewPlaceholder" class="text-neutral-400 text-center p-8">
+            <i class="fa fa-file-image-o text-4xl mb-2 block"></i>
+            <p>Image will appear here after upload</p>
+          </div>
+        </div>
+        
+        
+        
+        <div class="mt-4 flex flex-wrap gap-3">
+          <button id="scanBtn" class="hidden bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg transition-all shadow-sm hover:shadow flex-1 md:flex-none">
+            <i class="fa fa-magic mr-1"></i> Start Scan
+          </button>
+          <button id="adjustBtn" class="hidden bg-secondary hover:bg-secondary/90 text-white px-4 py-2 rounded-lg transition-all shadow-sm hover:shadow flex-1 md:flex-none">
+            <i class="fa fa-pencil mr-1"></i> <span id="adjustBtnText">Manual Adjust</span>
+          </button>
+          <button id="rescanBtn" class="hidden bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg transition-all shadow-sm hover:shadow flex-1 md:flex-none">
+            <i class="fa fa-refresh mr-1"></i> Rescan
+          </button>
+        </div>
+      </div>
+
+      <!-- Result Area -->
+      <div class="bg-white rounded-xl shadow-card p-5 hover:shadow-hover transition-all duration-300">
+        <h3 class="text-lg font-semibold mb-4 flex items-center">
+          <i class="fa fa-check-circle text-primary mr-2"></i> Scan Result
+        </h3>
+        <div class="w-full bg-neutral-100 rounded-lg overflow-hidden min-h-[200px] flex items-center justify-center">
+          <img id="scannedImage" class="max-h-[500px] object-contain hidden" />
+          <div id="resultPlaceholder" class="text-neutral-400 text-center p-8">
+            <i class="fa fa-file-pdf-o text-4xl mb-2 block"></i>
+            <p>Result will appear here after scanning</p>
+          </div>
+        </div>
+        <div class="mt-4 hidden" id="downloadArea">
+          <button id="downloadBtn" class="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 rounded-lg transition-all shadow-sm hover:shadow flex items-center justify-center">
+            <i class="fa fa-download mr-2"></i> Download Scan Result
+          </button>
+        </div>
+      </div>
+    </section>
+	
+	<!-- API Key Section -->
+    <section class="max-w-4xl mx-auto mb-12 bg-white p-6 rounded-xl shadow-card">
+      <div class="flex flex-col md:flex-row gap-4 items-center">
+        <label for="apiKey" class="block text-sm font-medium text-neutral-700 mb-0">API Key</label>
+		<div class="flex-1">
+          
+          <div class="relative">
+            <input 
+              type="password" 
+              id="apiKey" 
+              placeholder="Enter your RapidAPI key" 
+              class="w-full px-4 py-2.5 rounded-lg border border-neutral-300 focus:ring-2 focus:ring-primary focus:border-primary transition-all"
+              value="b5702baf9amsh4015a847e2df0bdp148995jsn5c7ed440fa23"
+            />
+            <button id="toggleApiKey" class="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-700">
+              <i class="fa fa-eye"></i>
+            </button>
+          </div>
+        </div>
+        <a 
+          href="https://rapidapi.com/aipix-aipix-pro/api/virtual-scanner/pricing" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          class="bg-secondary hover:bg-secondary/90 text-white px-5 py-2.5 rounded-lg transition-all shadow-sm hover:shadow flex items-center whitespace-nowrap"
+        >
+          <i class="fa fa-key mr-2"></i> Get API Key
+        </a>
+		
+      </div>
+      <p class="mt-2 text-sm text-neutral-500">
+        Need an API key? Get one from RapidAPI to use the document scanning service.
+      </p>
+	  <!-- Debug Information Area -->
+        <div class="mt-4 bg-neutral-50 p-4 rounded-lg border border-neutral-200">
+          <h4 class="text-sm font-medium text-neutral-700 mb-2 flex items-center">
+            <i class="fa fa-bug text-primary mr-2"></i> Debug Information
+          </h4>
+          <div id="promptOutput" class="text-xs text-neutral-600 bg-neutral-100 p-3 rounded-md prompt-container">
+            <p class="text-neutral-500 italic">No debug information yet</p>
+          </div>
+        </div>
+    </section>
+    <!-- Features Section -->
+	
+    <section class="max-w-6xl mx-auto mb-16">
+      <h3 class="text-xl font-bold text-center mb-8">Why Choose Our Scanning Tool</h3>
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-xl shadow-card hover:shadow-hover transition-all duration-300">
+          <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+            <i class="fa fa-bolt text-primary text-xl"></i>
+          </div>
+          <h4 class="font-semibold text-lg mb-2">Smart Recognition</h4>
+          <p class="text-neutral-600">Automatically detects document boundaries and accurately identifies content against different backgrounds</p>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow-card hover:shadow-hover transition-all duration-300">
+          <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+            <i class="fa fa-sliders text-primary text-xl"></i>
+          </div>
+          <h4 class="font-semibold text-lg mb-2">Manual Adjustment</h4>
+          <p class="text-neutral-600">Supports manual correction of document corners to ensure scan results meet your expectations</p>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow-card hover:shadow-hover transition-all duration-300">
+          <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+            <i class="fa fa-magic text-primary text-xl"></i>
+          </div>
+          <h4 class="font-semibold text-lg mb-2">Auto-Enhancement</h4>
+          <p class="text-neutral-600">Automatically enhances scan results through AI based on image type (document, photo) for better readability.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-neutral-800 text-white py-10">
+    <div class="container mx-auto px-4">
+      <div class="grid md:grid-cols-3 gap-8 mb-8">
+        <div>
+          <div class="flex items-center space-x-2 mb-4">
+            <i class="fa fa-file-text-o text-primary text-2xl"></i>
+            <h2 class="text-xl font-bold">Smart Document Scanner</h2>
+          </div>
+          <p class="text-neutral-400">A professional online document scanning tool that makes your document processing more efficient and convenient.</p>
+        </div>
+        <div>
+          <h3 class="font-semibold mb-4">Quick Links</h3>
+          <ul class="space-y-2">
+            <li><a href="#" class="text-neutral-400 hover:text-white transition-colors">User Guide</a></li>
+            <li><a href="#" class="text-neutral-400 hover:text-white transition-colors">FAQ</a></li>
+            <li><a href="#" class="text-neutral-400 hover:text-white transition-colors">Privacy Policy</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-semibold mb-4">Contact Us</h3>
+          <ul class="space-y-2">
+            <li class="flex items-center text-neutral-400"><i class="fa fa-envelope mr-2"></i> support@scanner.com</li>
+            <li class="flex items-center text-neutral-400"><i class="fa fa-phone mr-2"></i> 400-123-4567</li>
+          </ul>
+        </div>
+      </div>
+      <div class="border-t border-neutral-700 pt-6 text-center text-neutral-500">
+        <p>© 2023 Smart Document Scanner. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Loading Animation -->
+  <div id="loadingModal" class="fixed inset-0 bg-black/50 backdrop-blur z-50 hidden flex items-center justify-center">
+    <div class="bg-white p-6 rounded-xl shadow-lg flex items-center">
+      <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary mr-4"></div>
+      <p>Processing, please wait...</p>
+    </div>
+  </div>
+
+  <script>
+    const upload = document.getElementById('upload');
+    const scanBtn = document.getElementById('scanBtn');
+    const adjustBtn = document.getElementById('adjustBtn');
+    const rescanBtn = document.getElementById('rescanBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const imagePreview = document.getElementById('imagePreview');
+    const svgOverlay = document.getElementById('svgOverlay');
+    const scannedImage = document.getElementById('scannedImage');
+    const uploadContainer = document.getElementById('uploadContainer');
+    const previewPlaceholder = document.getElementById('previewPlaceholder');
+    const resultPlaceholder = document.getElementById('resultPlaceholder');
+    const downloadArea = document.getElementById('downloadArea');
+    const loadingModal = document.getElementById('loadingModal');
+    const uploadBtn = uploadContainer.querySelector('button');
+    const adjustBtnText = document.getElementById('adjustBtnText');
+    const canvasContainer = document.getElementById('canvasContainer');
+    const apiKeyInput = document.getElementById('apiKey');
+    const toggleApiKeyBtn = document.getElementById('toggleApiKey');
+    const promptOutput = document.getElementById('promptOutput'); // New element for prompt tracking
+
+    let selectedFile = null; // Stores the selected file
+    let currentCorners = [];
+    let scannedImageData = '';
+    let originalImageWidth = 0;
+    let originalImageHeight = 0;
+    let isAdjusting = false; // Flag for adjustment mode
+    let activeDragElement = null; // Currently dragged element
+    let userHasAdjusted = false; // Flag if user has adjusted corners
+    let apiKeyVisible = false; // Flag for API key visibility
+
+    // Update debug output display
+    function updateDebugOutput(text) {
+      promptOutput.innerHTML = `<pre class="whitespace-pre-wrap">${text}</pre>`;
+    }
+
+    // Clear debug output
+    function clearDebugOutput() {
+      updateDebugOutput('<p class="text-neutral-500 italic">No debug information yet</p>');
+    }
+
+    // Toggle API key visibility
+    toggleApiKeyBtn.addEventListener('click', function() {
+      apiKeyVisible = !apiKeyVisible;
+      apiKeyInput.type = apiKeyVisible ? 'text' : 'password';
+      this.innerHTML = apiKeyVisible ? '<i class="fa fa-eye-slash"></i>' : '<i class="fa fa-eye"></i>';
+    });
+
+    // Show loading state
+    function showLoading() {
+      loadingModal.classList.remove('hidden');
+    }
+
+    // Hide loading state
+    function hideLoading() {
+      loadingModal.classList.add('hidden');
+    }
+
+    // Initialize state (called when re-uploading)
+    function initializeState() {
+      currentCorners = [];
+      scannedImageData = '';
+      originalImageWidth = 0;
+      originalImageHeight = 0;
+      isAdjusting = false;
+      activeDragElement = null;
+      userHasAdjusted = false;
+      
+      // Clear SVG overlay
+      svgOverlay.innerHTML = '';
+      
+      // Reset button states
+      scanBtn.classList.add('hidden');
+      adjustBtn.classList.add('hidden');
+      rescanBtn.classList.add('hidden');
+      downloadArea.classList.add('hidden');
+      
+      // Reset text
+      adjustBtnText.textContent = 'Manual Adjust';
+      
+      // Reset result area
+      scannedImage.classList.add('hidden');
+      resultPlaceholder.classList.remove('hidden');
+      downloadArea.classList.add('hidden');
+      
+      // Clear debug output
+      clearDebugOutput();
+    }
+
+    // Get actual position and size of image in container
+    function getImagePosition() {
+      if (!imagePreview || !imagePreview.complete) return { x: 0, y: 0, width: 0, height: 0 };
+      
+      const container = canvasContainer;
+      const containerWidth = container.clientWidth;
+      const containerHeight = container.clientHeight;
+      
+      const imgWidth = originalImageWidth;
+      const imgHeight = originalImageHeight;
+      
+      // Calculate display size considering object-contain
+      const containerRatio = containerWidth / containerHeight;
+      const imageRatio = imgWidth / imgHeight;
+      
+      let displayWidth, displayHeight;
+      if (imageRatio > containerRatio) {
+        // Image is wider, fit to container width
+        displayWidth = containerWidth;
+        displayHeight = containerWidth / imageRatio;
+      } else {
+        // Image is taller, fit to container height
+        displayHeight = containerHeight;
+        displayWidth = containerHeight * imageRatio;
+      }
+      
+      // Calculate centered position
+      const x = (containerWidth - displayWidth) / 2;
+      const y = (containerHeight - displayHeight) / 2;
+      
+      return { x, y, width: displayWidth, height: displayHeight };
+    }
+
+    // Convert original image coordinates to SVG coordinates
+    function convertOriginalToSvgCoordinates(corners) {
+      if (!originalImageWidth || !originalImageHeight) return corners;
+      
+      const imgPos = getImagePosition();
+      
+      // Calculate scaling ratios
+      const scaleX = imgPos.width / originalImageWidth;
+      const scaleY = imgPos.height / originalImageHeight;
+      
+      // Convert coordinates
+      const svgCorners = [];
+      for (let i = 0; i < corners.length; i += 2) {
+        svgCorners.push(corners[i] * scaleX + imgPos.x);
+        svgCorners.push(corners[i + 1] * scaleY + imgPos.y);
+      }
+      
+      return svgCorners;
+    }
+
+    // Convert SVG coordinates back to original image coordinates
+    function convertSvgToOriginalCoordinates(corners) {
+      if (!originalImageWidth || !originalImageHeight) return corners;
+      
+      const imgPos = getImagePosition();
+      
+      // Calculate scaling ratios
+      const scaleX = originalImageWidth / imgPos.width;
+      const scaleY = originalImageHeight / imgPos.height;
+      
+      // Convert coordinates
+      const originalCorners = [];
+      for (let i = 0; i < corners.length; i += 2) {
+        originalCorners.push((corners[i] - imgPos.x) * scaleX);
+        originalCorners.push((corners[i + 1] - imgPos.y) * scaleY);
+      }
+      
+      return originalCorners;
+    }
+
+    // Draw corners and polygon overlay
+    function drawCorners(corners, isEditing = false) {
+      // Get image position and dimensions
+      const imgPos = getImagePosition();
+      
+      // Set SVG dimensions to match container
+      svgOverlay.setAttribute('width', canvasContainer.clientWidth);
+      svgOverlay.setAttribute('height', canvasContainer.clientHeight);
+      svgOverlay.innerHTML = '';
+
+      if (!corners || corners.length === 0) return;
+
+      // Convert to point array
+      const pts = [];
+      for (let i = 0; i < corners.length; i += 2) {
+        pts.push({ x: corners[i], y: corners[i + 1] });
+      }
+
+      // Draw polygon
+      const poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+      poly.setAttribute('fill', isEditing ? 'rgba(37, 99, 235, 0.3)' : 'rgba(37, 99, 235, 0.1)');
+      poly.setAttribute('stroke', isEditing ? '#4f46e5' : '#2563eb');
+      poly.setAttribute('stroke-width', isEditing ? '3' : '2');
+      poly.setAttribute('points', pts.map(p => `${p.x},${p.y}`).join(' '));
+      poly.classList.add('transition-all', 'duration-300');
+      svgOverlay.appendChild(poly);
+
+      // Exit if not in editing mode
+      if (!isEditing) return;
+
+      // Create transparent drag layer (to solve boundary drag issues)
+      const dragLayer = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+      dragLayer.setAttribute('width', canvasContainer.clientWidth);
+      dragLayer.setAttribute('height', canvasContainer.clientHeight);
+      dragLayer.setAttribute('fill', 'transparent');
+      dragLayer.setAttribute('pointer-events', 'all');
+      svgOverlay.appendChild(dragLayer);
+
+      // Draw draggable corners (only in edit mode)
+      pts.forEach((pt, index) => {
+        // Create transparent drag target (increase clickable area)
+        const dragTarget = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        dragTarget.setAttribute('cx', pt.x);
+        dragTarget.setAttribute('cy', pt.y);
+        dragTarget.setAttribute('r', 20); // Larger clickable area
+        dragTarget.setAttribute('fill', 'transparent');
+        dragTarget.setAttribute('stroke', 'none');
+        dragTarget.setAttribute('pointer-events', 'all');
+        dragTarget.setAttribute('data-index', index);
+        dragTarget.classList.add('cursor-move');
+        svgOverlay.appendChild(dragTarget);
+
+        // Draw visible corner marker
+        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        circle.setAttribute('cx', pt.x);
+        circle.setAttribute('cy', pt.y);
+        circle.setAttribute('r', 10);
+        circle.setAttribute('fill', '#4f46e5');
+        circle.setAttribute('stroke', 'white');
+        circle.setAttribute('stroke-width', '2');
+        circle.setAttribute('pointer-events', 'none'); // Ignore direct clicks
+        circle.classList.add('transition-all', 'hover:r-12', 'hover:fill-primary', 'hover:shadow-lg', 'hover:shadow-primary/20');
+        svgOverlay.appendChild(circle);
+
+        // Add corner index label
+        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        text.setAttribute('x', pt.x);
+        text.setAttribute('y', pt.y + 4);
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('fill', 'white');
+        text.setAttribute('font-size', '12');
+        text.setAttribute('font-weight', 'bold');
+        text.setAttribute('pointer-events', 'none'); // Ignore direct clicks
+        text.textContent = index + 1;
+        svgOverlay.appendChild(text);
+
+        // Setup drag handlers for mouse and touch events
+        setupDragHandlers(dragTarget, pt, index);
+      });
+
+      function setupDragHandlers(element, point, index) {
+        // Mouse events
+        element.onmousedown = function (e) {
+          e.preventDefault();
+          startDrag(element, point, index, e.clientX, e.clientY);
+        };
+
+        // Touch events
+        element.ontouchstart = function (e) {
+          e.preventDefault();
+          const touch = e.touches[0];
+          startDrag(element, point, index, touch.clientX, touch.clientY);
+        };
+      }
+
+      function startDrag(element, point, index, clientX, clientY) {
+        activeDragElement = element;
+        
+        // Get current corner index
+        const cornerIndex = parseInt(element.getAttribute('data-index'));
+        
+        // Highlight selected point
+        const circles = svgOverlay.querySelectorAll('circle:not([fill="transparent"])');
+        circles.forEach((circle, i) => {
+          if (i === cornerIndex) {
+            circle.setAttribute('r', 12);
+            circle.setAttribute('fill', '#2563eb');
+            circle.setAttribute('stroke-width', '3');
+          }
+        });
+        
+        // Create visual feedback for dragging
+        const dragCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        dragCircle.setAttribute('cx', point.x);
+        dragCircle.setAttribute('cy', point.y);
+        dragCircle.setAttribute('r', 18);
+        dragCircle.setAttribute('fill', 'rgba(79, 70, 229, 0.2)');
+        dragCircle.setAttribute('stroke', '#4f46e5');
+        dragCircle.setAttribute('stroke-width', '1');
+        dragCircle.setAttribute('pointer-events', 'none');
+        svgOverlay.appendChild(dragCircle);
+
+        // Calculate initial position
+        const rect = canvasContainer.getBoundingClientRect();
+        const startX = clientX - rect.left;
+        const startY = clientY - rect.top;
+        
+        // Restrict area to image bounds
+        const padding = 0;
+        const minX = imgPos.x + padding;
+        const minY = imgPos.y + padding;
+        const maxX = imgPos.x + imgPos.width - padding;
+        const maxY = imgPos.y + imgPos.height - padding;
+
+        function moveHandler(e) {
+          if (!activeDragElement) return;
+          
+          // Get mouse/touch position
+          let clientX, clientY;
+          if (e.type.startsWith('mouse')) {
+            clientX = e.clientX;
+            clientY = e.clientY;
+          } else {
+            const touch = e.touches[0];
+            clientX = touch.clientX;
+            clientY = touch.clientY;
+          }
+          
+          // Calculate coordinates relative to container
+          const x = clientX - rect.left;
+          const y = clientY - rect.top;
+          
+          // Constrain to image bounds
+          const constrainedX = Math.max(minX, Math.min(x, maxX));
+          const constrainedY = Math.max(minY, Math.min(y, maxY));
+          
+          // Update point position
+          point.x = constrainedX;
+          point.y = constrainedY;
+          
+          // Update visual elements
+          element.setAttribute('cx', constrainedX);
+          element.setAttribute('cy', constrainedY);
+          
+          // Update visible circles
+          const circles = svgOverlay.querySelectorAll('circle:not([fill="transparent"])');
+          circles.forEach((circle, i) => {
+            if (i === cornerIndex) {
+              circle.setAttribute('cx', constrainedX);
+              circle.setAttribute('cy', constrainedY);
+            }
+          });
+          
+          // Update text labels
+          const texts = svgOverlay.querySelectorAll('text');
+          texts.forEach((text, i) => {
+            if (i === cornerIndex) {
+              text.setAttribute('x', constrainedX);
+              text.setAttribute('y', constrainedY + 4);
+            }
+          });
+          
+          // Update drag feedback
+          dragCircle.setAttribute('cx', constrainedX);
+          dragCircle.setAttribute('cy', constrainedY);
+          
+          // Update polygon
+          poly.setAttribute('points', pts.map(p => `${p.x},${p.y}`).join(' '));
+          
+          // Update debug output with current corner positions
+          updateCorners();
+          const originalSizeCorners = convertSvgToOriginalCoordinates(currentCorners);
+          const debugInfo = JSON.stringify({ quadrilateral: originalSizeCorners }, null, 2);
+          updateDebugOutput(`Current corner positions (will be submitted on rescan):\n${debugInfo}`);
+        }
+
+        function upHandler(e) {
+          if (!activeDragElement) return;
+          
+          // Restore point style
+          const circles = svgOverlay.querySelectorAll('circle:not([fill="transparent"])');
+          circles.forEach((circle, i) => {
+            if (i === cornerIndex) {
+              circle.setAttribute('r', 10);
+              circle.setAttribute('fill', '#4f46e5');
+              circle.setAttribute('stroke-width', '2');
+            }
+          });
+          
+          // Remove drag feedback
+          svgOverlay.removeChild(dragCircle);
+          
+          // Remove event listeners
+          document.removeEventListener('mousemove', moveHandler);
+          document.removeEventListener('mouseup', upHandler);
+          document.removeEventListener('touchmove', moveHandler);
+          document.removeEventListener('touchend', upHandler);
+          
+          // Update corner data
+          updateCorners();
+          
+          // Mark user adjustment and show rescan button
+          userHasAdjusted = true;
+          rescanBtn.classList.remove('hidden');
+          
+          // Reset active element
+          activeDragElement = null;
+        }
+
+        // Add global event listeners
+        document.addEventListener('mousemove', moveHandler);
+        document.addEventListener('mouseup', upHandler);
+        document.addEventListener('touchmove', moveHandler);
+        document.addEventListener('touchend', upHandler);
+      }
+
+      function updateCorners() {
+        currentCorners = pts.flatMap(p => [p.x, p.y]);
+      }
+    }
+
+    // Convert image file to WebP format
+    function convertToWebP(file, quality = 80) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+          const img = new Image();
+          
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+            
+            // Convert to WebP format
+            canvas.toBlob(
+              blob => {
+                if (blob) {
+                  // Create new File object
+                  const webpFile = new File([blob], file.name.replace(/\.[^/.]+$/, '.webp'), {
+                    type: 'image/webp'
+                  });
+                  resolve(webpFile);
+                } else {
+                  // Fallback to original file if WebP not supported
+                  console.log('WebP format not supported, using original file');
+                  resolve(file);
+                }
+              },
+              'image/webp',
+              quality / 100
+            );
+          };
+          
+          img.onerror = reject;
+          img.src = e.target.result;
+        };
+        
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // Handle file upload
+    upload.addEventListener('change', async function () {
+      const file = this.files[0];
+      if (!file) return;
+      
+      // Initialize all states for new upload
+      initializeState();
+      
+      // Show upload state
+      uploadContainer.classList.add('border-primary');
+      
+      try {
+        // Convert to WebP format
+        showLoading();
+        const webpFile = await convertToWebP(file);
+        selectedFile = webpFile;
+        hideLoading();
+        
+        // Create temporary image to get original dimensions
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          imagePreview.src = e.target.result;
+          imagePreview.style.display = 'block';
+          previewPlaceholder.classList.add('hidden');
+          svgOverlay.innerHTML = '';
+          scanBtn.classList.remove('hidden'); // Show scan button for new upload
+          
+          // Create temporary image to get original dimensions
+          const tempImg = new Image();
+          tempImg.onload = function() {
+            originalImageWidth = tempImg.width;
+            originalImageHeight = tempImg.height;
+            console.log('Original image dimensions:', originalImageWidth, originalImageHeight);
+            
+            // Redraw after image loads
+            setTimeout(() => {
+              if (currentCorners.length) {
+                drawCorners(currentCorners, isAdjusting);
+              }
+            }, 100);
+          };
+          tempImg.src = e.target.result;
+          
+          // Reset result area
+          scannedImage.classList.add('hidden');
+          resultPlaceholder.classList.remove('hidden');
+          downloadArea.classList.add('hidden');
+          
+          // Update debug output
+          updateDebugOutput(`Uploaded file: ${file.name} (${formatFileSize(file.size)})`);
+        };
+        reader.readAsDataURL(webpFile);
+      } catch (error) {
+        hideLoading();
+        alert('Error processing image: ' + error.message);
+        console.error('Image conversion error:', error);
+        updateDebugOutput(`Error processing image: ${error.message}`);
+      }
+    });
+
+    // Helper function to format file size
+    function formatFileSize(bytes, decimals = 2) {
+      if (bytes === 0) return '0 Bytes';
+      
+      const k = 1024;
+      const dm = decimals < 0 ? 0 : decimals;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+    }
+
+    // Trigger file selection when clicking upload area
+    uploadContainer.addEventListener('click', function(e) {
+      if (e.target === uploadContainer || e.target === uploadBtn) {
+        upload.click();
+      }
+    });
+
+    // First scan request
+    scanBtn.addEventListener('click', function () {
+      // Validate API key
+      const apiKey = apiKeyInput.value.trim();
+      if (!apiKey) {
+        alert("Please enter your API key");
+        apiKeyInput.focus();
+        return;
+      }
+      
+      if (!selectedFile) return alert("Please upload an image first");
+      
+      // Update debug output
+      updateDebugOutput("Sending initial scan request with empty prompt...");
+      
+      showLoading();
+      callApi(selectedFile, "");
+    });
+
+    // Secondary scan request (with user-adjusted corners)
+    rescanBtn.addEventListener('click', function () {
+      // Validate API key
+      const apiKey = apiKeyInput.value.trim();
+      if (!apiKey) {
+        alert("Please enter your API key");
+        apiKeyInput.focus();
+        return;
+      }
+      
+      if (!currentCorners.length) return alert("Invalid corners");
+      if (!selectedFile) return alert("Please upload an image first");
+      
+      // Convert SVG coordinates back to original image coordinates
+      const originalSizeCorners = convertSvgToOriginalCoordinates(currentCorners);
+      const prompt = JSON.stringify({ quadrilateral: originalSizeCorners });
+      
+      // Update debug output
+      updateDebugOutput(`Sending rescan request with parameters:\n${JSON.stringify({ quadrilateral: originalSizeCorners }, null, 2)}`);
+      
+      showLoading();
+      callApi(selectedFile, prompt);
+      
+      // Exit adjustment mode
+      isAdjusting = false;
+      adjustBtnText.textContent = 'Manual Adjust';
+      // Restore adjust button style
+      adjustBtn.classList.remove('bg-neutral-700', 'hover:bg-neutral-800');
+      adjustBtn.classList.add('bg-secondary', 'hover:bg-secondary/90');
+      drawCorners(currentCorners, false);
+    });
+
+    // Toggle adjustment mode
+    adjustBtn.addEventListener('click', function () {
+      if (currentCorners.length) {
+        isAdjusting = !isAdjusting;
+        
+        if (isAdjusting) {
+          // Enter adjustment mode
+          adjustBtnText.textContent = 'Cancel Adjustment';
+          // Change button style to cancel style
+          adjustBtn.classList.remove('bg-secondary', 'hover:bg-secondary/90');
+          adjustBtn.classList.add('bg-neutral-700', 'hover:bg-neutral-800');
+          // Show rescan button only if user has made adjustments
+          if (userHasAdjusted) {
+            rescanBtn.classList.remove('hidden');
+          }
+          
+          // Update debug output
+          const originalSizeCorners = convertSvgToOriginalCoordinates(currentCorners);
+          const debugInfo = JSON.stringify({ quadrilateral: originalSizeCorners }, null, 2);
+          updateDebugOutput(`Adjusting corners. Drag the markers to modify. Current positions:\n${debugInfo}`);
+        } else {
+          // Exit adjustment mode
+          adjustBtnText.textContent = 'Manual Adjust';
+          // Restore button style
+          adjustBtn.classList.remove('bg-neutral-700', 'hover:bg-neutral-800');
+          adjustBtn.classList.add('bg-secondary', 'hover:bg-secondary/90');
+          // Hide rescan button
+          rescanBtn.classList.add('hidden');
+          
+          // Update debug output
+          const originalSizeCorners = convertSvgToOriginalCoordinates(currentCorners);
+          const debugInfo = JSON.stringify({ quadrilateral: originalSizeCorners }, null, 2);
+          updateDebugOutput(`Corner adjustment cancelled. Current positions:\n${debugInfo}`);
+        }
+        
+        drawCorners(currentCorners, isAdjusting);
+      }
+    });
+
+    // Download scan result
+    downloadBtn.addEventListener('click', function() {
+      if (!scannedImageData) return;
+      
+      const a = document.createElement('a');
+      a.href = scannedImageData;
+      a.download = 'scanned-document.png';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      
+      // Update debug output
+      updateDebugOutput("Downloading scan result as 'scanned-document.png'");
+    });
+
+    // Call API with file upload
+    function callApi(file, prompt) {
+      const apiKey = apiKeyInput.value.trim();
+      if (!apiKey) {
+        hideLoading();
+        alert("Please enter your API key");
+        updateDebugOutput("Error: API key is required");
+        return;
+      }
+      
+      const data = new FormData();
+      data.append('file', file); // Upload file using 'file' field
+      data.append('prompt', prompt);
+
+      const xhr = new XMLHttpRequest();
+      xhr.withCredentials = false;
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+          hideLoading();
+          try {
+            const res = JSON.parse(xhr.responseText);
+            if (res.image && res.corners && res.corners.quadrilateral) {
+              scannedImage.src = res.image;
+              scannedImageData = res.image;
+              scannedImage.classList.remove('hidden');
+              resultPlaceholder.classList.add('hidden');
+              downloadArea.classList.remove('hidden');
+              
+              adjustBtn.classList.remove('hidden');
+              
+              // Save original corners from API response
+              const apiCorners = res.corners.quadrilateral;
+              
+              // Update debug output with API response
+              updateDebugOutput(`API response received. Detected corners:\n${JSON.stringify({ quadrilateral: apiCorners }, null, 2)}`);
+              
+              // Convert original image coordinates to SVG coordinates
+              currentCorners = convertOriginalToSvgCoordinates(apiCorners);
+              
+              // Automatically enter adjustment mode after first scan
+              isAdjusting = true;
+              adjustBtnText.textContent = 'Cancel Adjustment';
+              adjustBtn.classList.remove('bg-secondary', 'hover:bg-secondary/90');
+              adjustBtn.classList.add('bg-neutral-700', 'hover:bg-neutral-800');
+              
+              // Draw corners in edit mode
+              drawCorners(currentCorners, true);
+              
+              // Initially hide rescan button
+              rescanBtn.classList.add('hidden');
+              
+              // Hide scan button
+              scanBtn.classList.add('hidden');
+            } else {
+              alert("API returned incorrect format");
+              console.error("API response:", res);
+              updateDebugOutput(`Error: API returned incorrect format\n${JSON.stringify(res, null, 2)}`);
+            }
+          } catch (error) {
+            alert("Error processing API response");
+            console.error("Error parsing API response:", error);
+            updateDebugOutput(`Error parsing API response: ${error.message}`);
+          }
+        }
+      };
+
+      xhr.onerror = function() {
+        hideLoading();
+        alert("Network request failed. Please check API endpoint and key");
+        updateDebugOutput("Error: Network request failed. Please check API endpoint and key");
+      };
+
+      xhr.open('POST', 'https://virtual-scanner.p.rapidapi.com/api/virtual-scanner/');
+      xhr.setRequestHeader('x-rapidapi-key', apiKey);
+      xhr.setRequestHeader('x-rapidapi-host', 'virtual-scanner.p.rapidapi.com');
+      xhr.send(data);
+    }
+
+    // Change navigation style on scroll
+    window.addEventListener('scroll', function() {
+      const header = document.querySelector('header');
+      if (window.scrollY > 10) {
+        header.classList.add('py-2', 'shadow');
+        header.classList.remove('py-4');
+      } else {
+        header.classList.add('py-4');
+        header.classList.remove('py-2', 'shadow');
+      }
+    });
+
+    // Adjust corners when image finishes loading
+    imagePreview.addEventListener('load', function() {
+      // Redraw corners if available
+      if (currentCorners.length) {
+        drawCorners(currentCorners, isAdjusting);
+      }
+    });
+
+    // Redraw corners on window resize
+    window.addEventListener('resize', function() {
+      if (currentCorners.length && imagePreview.offsetWidth > 0) {
+        // Recalculate corner positions
+        const originalCorners = convertSvgToOriginalCoordinates(currentCorners);
+        currentCorners = convertOriginalToSvgCoordinates(originalCorners);
+        drawCorners(currentCorners, isAdjusting);
+      }
+    });
+
+    // Prevent default behavior during dragging
+    document.addEventListener('dragover', function(e) {
+      e.preventDefault();
+    });
+
+    document.addEventListener('dragend', function(e) {
+      e.preventDefault();
+    });
+  </script>
+</body>
+</html>    
