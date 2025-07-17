@@ -1,4 +1,10 @@
+
+![Virtual Scanner](https://github.com/zhuxingwan/virtual-scanner/blob/main/banner.png?raw=true)
+
 Virtual Scanner is a professional online document scanning tool that uses advanced AI technology to automatically detect document boundaries and generate clear scan results. It supports manual adjustment features to ensure high-quality document scans even against complex backgrounds.
+
+## Online Demo
+Try the live demo here: [Virtual Scanner Demo](https://codepen.io/jack-zhu/full/XJmmRbE)
 
 ## Key Features
 
@@ -12,14 +18,12 @@ Virtual Scanner is a professional online document scanning tool that uses advanc
 ## Demo Examples
 
 ### Main Interface Preview
-![Main Interface]([https://github.com/zhuxingwan/virtual-scanner/blob/main/1.png])
+![Main Interface](https://github.com/zhuxingwan/virtual-scanner/blob/main/1.png?raw=true)
 
 ### Scanning Process
-![Scanning Process](https://picsum.photos/800/400)
+![Scanning Process](https://github.com/zhuxingwan/virtual-scanner/blob/main/2.png?raw=true)
 
 ### Manual Adjustment Feature
-![Manual Adjustment](https://picsum.photos/800/400)
+![Manual Adjustment](https://github.com/zhuxingwan/virtual-scanner/blob/main/3.png?raw=true)
 
-### Scan Result Example
-![Scan Result](https://picsum.photos/800/400)
 
