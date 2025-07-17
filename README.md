@@ -12,7 +12,7 @@ Virtual Scanner is a professional online document scanning tool that uses advanc
 ## Demo Examples
 
 ### Main Interface Preview
-![Main Interface](https://picsum.photos/800/400)
+![Main Interface]([https://picsum.photos/800/400](https://github.com/zhuxingwan/virtual-scanner/blob/main/3.png))
 
 ### Scanning Process
 ![Scanning Process](https://picsum.photos/800/400)
